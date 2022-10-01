@@ -1,0 +1,30 @@
+[package]
+name = "thotp"
+authors = ["biblius <crazycompanyxxl@gmail.com>"]
+description = "An RFC based implementation of TOTPs and HOTPs"
+homepage = "https://github.com/JosipBeDa/thotp"
+repository = "https://github.com/JosipBeDa/thotp"
+license = "MIT"
+version = "0.1.0"
+edition = "2021"
+exclude = ["tests/"]
+keywords = ["otp", "totp", "hotp", "thotp", "authenticator"]
+categories = ["cryptography"]
+readme = "README.md"
+
+[dependencies]
+digest = "0.10.5"
+hmac = "0.12.1"
+sha-1 = { version = "0.10.0" }
+rand = { version = "0.8.5", features = ["std_rng"] }
+data-encoding = { version = "2.3.2", optional = true }
+sha2 = { version = "0.10.6", optional = true }
+qrcode = { version = "0.12.0", optional = true }
+percent-encoding = { version = "2.2.0", optional = true }
+thiserror = "1.0.37"
+
+[features]
+default = ["custom_otp", "encoding", "qr"]
+custom_otp = ["dep:sha2"]
+encoding = ["dep:data-encoding"]
+qr = ["dep:qrcode", "dep:percent-encoding", "dep:data-encoding"]
