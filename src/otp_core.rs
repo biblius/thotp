@@ -18,8 +18,8 @@ pub(super) const DIGITS_DEFAULT: u8 = 6;
 /// until the unix epoch.
 pub(super) const TIME_STEP: u8 = 30;
 
-/// Used by the verification functions as an offset to accept passwords from the previoues and next
-/// time steps valid.
+/// Used by the verification functions as an offset to accept passwords from the previous and next
+/// time steps.
 pub(super) const ALLOWED_DRIFT: u8 = 1;
 
 /// Generates a MAC of the secret key and nonce, hashed with the provided algorithm.
