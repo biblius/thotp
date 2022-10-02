@@ -2,7 +2,9 @@
 
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 pub use qrcode::EcLevel;
-use qrcode::{self, render::svg::Color, types::QrError, QrCode};
+use qrcode::{self, render::svg::Color, QrCode};
+
+use crate::ThotpError;
 
 /// Generates an otp uri following [this specification](https://github.com/google/google-authenticator/wiki/Key-Uri-Format)
 /// The `otp_type` must be either `"totp"` or `"hotp"`.
@@ -37,7 +39,7 @@ pub fn generate_code(
     width: Option<u32>,
     height: Option<u32>,
     ec_level: EcLevel,
-) -> Result<String, QrError> {
+) -> Result<String, ThotpError> {
     let width = if let Some(width) = width { width } else { 0 };
     let height = if let Some(height) = height { height } else { 0 };
     let uri = generate_otp_uri(otp_type, secret, label, issuer);
@@ -52,13 +54,11 @@ pub fn generate_code(
 
 #[cfg(test)]
 mod tests {
-    use std::time::{SystemTime, UNIX_EPOCH};
-
+    use super::super::encoding::{decode, encode};
+    use super::super::ThotpError;
+    use super::super::{generate_secret, otp, TIME_STEP};
     use super::*;
-    use crate::{
-        encoding::{decode, encode},
-        generate_secret, otp, TIME_STEP,
-    };
+    use std::time::{SystemTime, UNIX_EPOCH};
 
     // These tests don't assert anything, but are useful for debugging qr codes and codes from
     // the authenticator
@@ -82,26 +82,28 @@ mod tests {
 
     // Used to check the current time totp, useful to compare to https://totp.danhersam.com/
     #[test]
-    fn totp_now() {
+    fn totp_now() -> Result<(), ThotpError> {
         let secret = "XNIOCRY5QWDXAUIQ7MN4CMNDY3RVZOFIWAPCZI5OQAYCD7SUZEJL6JTLV7BQPVRD2P2S65USD5XOEGQXMWI4NRJ3C2LLVHYHOWIOPLCYO74YQNCSGSW4MBEQRV3BER3K";
-        let secret = decode(secret, data_encoding::BASE32);
+        let secret = decode(secret, data_encoding::BASE32)?;
         let nonce = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_secs()
             / TIME_STEP as u64;
-        let _totp = otp(&secret, nonce);
+        let _totp = otp(&secret, nonce)?;
         // println!("TOTP: {}", _totp);
         // let _res = verify_totp("789705", &secret, 0);
+        Ok(())
     }
 
     #[test]
-    fn hotp_now() {
+    fn hotp_now() -> Result<(), ThotpError> {
         let secret = "ACTGTGXN6K5SIAWMTDPAUULYEZI2RFA3NFJC27U4EO4PNL6UEMUB3ZOD7BGOIRAFF54RDGBAKAZKTCX2CDRLPQ3GPW42AXVD4SEKLWNTBM56O4EXP7HUBBGKEEUHM4IF";
-        let secret = decode(secret, data_encoding::BASE32);
+        let secret = decode(secret, data_encoding::BASE32)?;
         let nonce = 3;
-        let _totp = otp(&secret, nonce);
+        let _totp = otp(&secret, nonce)?;
         // println!("HOTP: {}", _totp);
         // let _res = verify_totp("789705", &secret, 0);
+        Ok(())
     }
 }
