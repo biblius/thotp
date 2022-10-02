@@ -9,7 +9,7 @@
  This module by itself allows you to generate and verify TOTPs and HOTPs using the default
  algorithm SHA-1, the default digit length of 6 and the default time step of 30 for TOTPs.
 
- *The following applies only if you set `default-features = false`, by default it is included*:
+ *The following applies only if you set `default-features = false`, by default they are included*:
 
  If you need finer controls over password generation and verification use the `custom_otp` feature flag
  to gain access to the [custom](https://docs.rs/thotp/0.1.0/thotp/custom/index.html) module.
