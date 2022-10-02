@@ -12,13 +12,12 @@
  *The following applies only if you set `default-features = false`, by default it is included*:
 
  If you need finer controls over password generation and verification use the `custom_otp` feature flag
- to gain access to the [custom] module.
+ to gain access to the [custom](https://docs.rs/thotp/0.1.0/thotp/custom/index.html) module.
 
- The `encoding` feature flag gives access to the [encoding] module which provides 2 basic functions to encode
+ The `encoding` feature flag gives access to the [encoding](https://docs.rs/thotp/0.1.0/thotp/encoding/index.html) module which provides 2 basic functions to encode
  and decode the generated keys to an encoding of choice avilable from the [data_encoding](https://docs.rs/data-encoding/latest/data_encoding/index.html) crate.
 
- The `qr` feature flag gives access to the [qr] module and enables QR code generation of the
- generated secret keys ready to be used by authenticator apps.
+ The `qr` feature flag gives access to the [qr](https://docs.rs/thotp/0.1.0/thotp/qr/index.html) module and enables QR code generation of the generated secret keys ready to be used by authenticator apps.
 
  ## Example usage
 

@@ -156,7 +156,7 @@ pub fn otp(secret: &[u8], nonce: u64) -> Result<String, ThotpError> {
 /// to generate a password to compare with the given one. If you need finer control
 /// of the verification parameters, use the `custom_otp` feature flag.
 ///
-/// The function considers passwords from the previous and next [ALLOWED_DRIFT] time slices
+/// The function considers passwords from the previous and next `ALLOWED_DRIFT` time slices
 /// to be valid.
 ///
 /// The function returns a tuple whose first element is a boolean indicating whether any
