@@ -26,7 +26,7 @@
 //!     verify_totp,
 //!     generate_secret,
 //!     encoding::{encode, decode},
-//!     qr::generate_code,
+//!     qr,
 //! };
 //! use std::time::{SystemTime, UNIX_EPOCH};
 //!
@@ -40,9 +40,9 @@
 //! // The data_encoding crate is re-exported for convenience
 //! let encoded = encode(&secret, data_encoding::BASE32);
 //!  
-//! // Store the secret somewhere safe
+//! // ...store the secret somewhere safe...
 //!
-//! let qr_code = generate_code(
+//! let uri = qr::otp_uri(
 //!     // Type of otp
 //!     "totp",
 //!     // The encoded secret
@@ -51,18 +51,24 @@
 //!     "Big Corp:john.doe@email.com",
 //!     // Your big corp issuer
 //!     "Big Corp",
+//!     // We are generating a TOTP so we don't need a counter value
+//!     None,
+//! ).expect("yikes");
+//!
+//! let qr_code = qr::generate_code_svg(
+//!     &uri,
 //!     // The qr code width (None defaults to 200)
 //!     None,
 //!     // The qr code height (None defaults to 200)
 //!     None,
 //!     // Correction level, M is the default
-//!     qrcode::EcLevel::M
+//!     qrcode::EcLevel::M,
 //! )
 //! .expect("uh oh");
 //!
-//! // Scan qr with some authenticator app
+//! // ..scan the qr code with an authenticator app...
 //!
-//! // Verify a password provided from the client, assume this is what they calculated
+//! // Verify a password provided from the client
 //!
 //! // When generating an OTP we have to calculate the current time slice
 //! let time_step_now = SystemTime::now()
@@ -71,9 +77,10 @@
 //!      .as_secs()
 //!      / TIME_STEP as u64;
 //!
+//! // Let us assume this comes from the client
 //! let pw = otp(&secret, time_step_now).unwrap();
 //!
-//! // The verify function does this internally
+//! // The verify function does calculates the current slice internally
 //! let (result, discrepancy) = verify_totp(&pw, &secret, 0).unwrap();
 //!
 //! assert_eq!((true, 0),(result, discrepancy));
@@ -206,7 +213,7 @@ pub fn verify_totp(
     let end = nonce.saturating_add(ALLOWED_DRIFT as u64);
 
     // Keeps track of how large the deicrepancy is
-    let mut i = -1 * ALLOWED_DRIFT as i16;
+    let mut i = -(ALLOWED_DRIFT as i16);
 
     for n in start..=end {
         let pass = otp(secret, n)?;
@@ -301,6 +308,12 @@ pub enum ThotpError {
     #[error("Invalid buffer length provided for Hmac: `{0}`")]
     InvalidLength(#[from] digest::InvalidLength),
 
+    #[error("Invalid digits provided, the minimum is 6 and the maximum is 10")]
+    InvalidDigits,
+
+    #[error("{0}")]
+    InvalidUri(String),
+
     #[error("An error occurred while trying to calculate system time: `{0}`")]
     SystemTime(#[from] std::time::SystemTimeError),
 
@@ -311,6 +324,10 @@ pub enum ThotpError {
     #[cfg(feature = "qr")]
     #[error("An error occurred while generating QR code: `{0}`")]
     QR(#[from] qrcode::types::QrError),
+
+    #[cfg(feature = "qr")]
+    #[error("Formatting error: {0}")]
+    Format(#[from] std::fmt::Error),
 }
 
 #[cfg(test)]

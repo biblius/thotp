@@ -1,4 +1,6 @@
-//! Contains functions providing finer control over OTP generation and verification parameters
+//! Contains functions providing finer control over OTP generation and verification parameters. This
+//! module re-exports the hashing algorithms `Sha1`, `Sha256` and `Sha512` to use with the provided
+//! functions.
 
 use super::*;
 use digest::{
@@ -127,7 +129,7 @@ where
     let end = nonce.saturating_add(allowed_drift as u64);
 
     // Keeps track of how large the deicrepancy is
-    let mut i = -1 * ALLOWED_DRIFT as i16;
+    let mut i = -(ALLOWED_DRIFT as i16);
 
     for n in start..=end {
         let pass = otp_custom::<H>(secret, n, digits)?;
