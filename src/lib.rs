@@ -164,10 +164,33 @@ pub fn otp(secret: &[u8], nonce: u64) -> Result<String, ThotpError> {
 /// indicating the number of time slices the valid password deviates from the current
 /// time slice. In this function the only possible values for the discrepancy are -1 (indicating the password from
 /// the slice prior is valid), 0 (indicating the current one is valid) and 1 (indicating the password from
-/// the next time slice is valid)
-/// since it will only look at the previous and next time slice.
+/// the next time slice is valid) since it will only look at the previous and next time slice in
+/// addition to the current one.
 ///
 /// If a `timestamp` of 0 is provided, the current system time will be used for the calculation.
+///
+/// ## Example
+/// ```
+/// use thotp::{otp, generate_secret, verify_totp};
+/// use std::time::{SystemTime, UNIX_EPOCH};
+///
+/// const TIME_STEP: u8 = 30;
+///
+/// let secret = generate_secret(420);
+///
+/// let time_step_now = SystemTime::now()
+///      .duration_since(UNIX_EPOCH)
+///      .unwrap()
+///      .as_secs()
+///      / TIME_STEP as u64;
+///
+/// let pw = otp(&secret, time_step_now).unwrap();
+///
+/// let (result, discrepancy) = verify_totp(&pw, &secret, 0).unwrap();
+///
+/// assert_eq!((true, 0),(result, discrepancy));
+///
+/// ```
 pub fn verify_totp(
     password: &str,
     secret: &[u8],
@@ -244,6 +267,21 @@ pub fn verify_hotp(
 
 /// Generates a secret key, i.e. a buffer filled with random bytes. The RFC recommended buffer
 /// size is 160, however some implementations use less.
+///
+/// ## Example
+/// ```
+/// use thotp::generate_secret;
+/// use thotp::encoding::encode;
+///
+/// let secret = generate_secret(420);
+///
+/// assert_eq!(secret.len(), 420);
+///
+/// let encoded = encode(&secret, data_encoding::BASE32);
+///
+/// // Store it or generate a qr code...
+///
+/// ```
 pub fn generate_secret(size: usize) -> Vec<u8> {
     let mut key = vec![0; size];
 
