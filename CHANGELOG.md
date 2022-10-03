@@ -2,6 +2,10 @@
 
 All notable changes will be documented in this file.
 
+## [0.1.11] - 2022/11/02
+### Changed
+- Updated README and moved QR example to front page, fixed some docs and added more.
+
 ## [0.1.1] - 2022/10/02
 ### Added
 - Example of how to test the generated QR code
