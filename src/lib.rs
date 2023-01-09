@@ -218,7 +218,7 @@ pub fn otp(secret: &[u8], nonce: u64) -> Result<String, ThotpError> {
     let mut result = (trunc % 10_u32.pow(DIGITS_DEFAULT as u32)).to_string();
 
     // Pad with 0s if the number is shorter than the necessary digits
-    for i in 0..(DIGITS_DEFAULT as usize - result.len() as usize) {
+    for i in 0..(DIGITS_DEFAULT as usize - result.len()) {
         result.insert(i, '0');
     }
 
@@ -411,46 +411,46 @@ mod tests {
         let password = otp(TEST_KEY, counter)?;
         let (result, counter) = verify_hotp(&password, TEST_KEY, counter, 0)?;
         assert_eq!(counter, 2);
-        assert_eq!(result, true);
+        assert!(result);
 
         let password = otp_custom::<Sha1>(TEST_KEY, counter, DIGITS_DEFAULT)?;
         let (result, counter) = verify_hotp(&password, TEST_KEY, counter, 0)?;
         assert_eq!(counter, 3);
-        assert_eq!(result, true);
+        assert!(result);
 
         let (result, counter) = verify_hotp("fail", TEST_KEY, counter, 0)?;
-        assert_eq!(result, false);
+        assert!(result);
         assert_eq!(counter, 3);
 
         // Test with lookahead and overflow
         let password = otp_custom::<Sha1>(TEST_KEY, counter, DIGITS_DEFAULT)?;
         let (result, counter) = verify_hotp(&password, TEST_KEY, u64::MAX, 20)?;
-        assert_eq!(result, true);
+        assert!(result);
         assert_eq!(counter, 4);
 
         let password = otp_custom::<Sha1>(TEST_KEY, u64::MAX - 1, DIGITS_DEFAULT)?;
         let (result, counter) = verify_hotp(&password, TEST_KEY, u64::MAX - 18, 20)?;
-        assert_eq!(result, true);
+        assert!(result);
         assert_eq!(counter, u64::MAX);
 
         // Sha1
         let password = otp_custom::<Sha1>(TEST_KEY, counter, DIGITS_DEFAULT)?;
         let (result, counter) = verify_hotp(&password, TEST_KEY, u64::MAX, 0)?;
-        assert_eq!(result, true);
+        assert!(result);
         assert_eq!(counter, 0);
 
         // Sha256
         let password = otp_custom::<Sha256>(TEST_KEY, u64::MAX - 1, DIGITS_DEFAULT)?;
         let (result, counter) =
             verify_hotp_custom::<Sha256>(&password, TEST_KEY, u64::MAX - 18, 20, DIGITS_DEFAULT)?;
-        assert_eq!(result, true);
+        assert!(result);
         assert_eq!(counter, u64::MAX);
 
         // Sha512
         let password = otp_custom::<Sha512>(TEST_KEY, u64::MAX - 1, DIGITS_DEFAULT)?;
         let (result, counter) =
             verify_hotp_custom::<Sha512>(&password, TEST_KEY, u64::MAX - 18, 20, DIGITS_DEFAULT)?;
-        assert_eq!(result, true);
+        assert!(result);
         assert_eq!(counter, u64::MAX);
 
         Ok(())

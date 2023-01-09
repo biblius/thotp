@@ -41,7 +41,7 @@ where
     let mut result = (trunc % 10_u32.pow(digits as u32)).to_string();
 
     // Pad with 0s if the number is shorter than the necessary digits
-    for i in 0..(digits as usize - result.len() as usize) {
+    for i in 0..(digits as usize - result.len()) {
         result.insert(i, '0');
     }
 
