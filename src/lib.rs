@@ -237,7 +237,9 @@ pub fn otp(secret: &[u8], nonce: u64) -> Result<String, ThotpError> {
 /// The function returns a tuple whose first element is a boolean indicating whether any
 /// of the passwords in the allowed drift match and the second element is a number
 /// indicating the number of time slices the valid password deviates from the current
-/// time slice. In this function the only possible values for the discrepancy are -1 (indicating the password from
+/// time slice.
+///
+/// This function's allowed drifts are -1 (indicating the password from
 /// the slice prior is valid), 0 (indicating the current one is valid) and 1 (indicating the password from
 /// the next time slice is valid) since it will only look at the previous and next time slice in
 /// addition to the current one.
@@ -419,7 +421,7 @@ mod tests {
         assert!(result);
 
         let (result, counter) = verify_hotp("fail", TEST_KEY, counter, 0)?;
-        assert!(result);
+        assert!(!result);
         assert_eq!(counter, 3);
 
         // Test with lookahead and overflow
